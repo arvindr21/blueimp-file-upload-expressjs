@@ -2,9 +2,9 @@
 
 *****
 
--> A simple express module for integrating jQuery File Upload.
+* A simple express module for integrating jQuery File Upload.
 
--> The code is borrowed from [here](https://github.com/blueimp/jQuery-File-Upload/tree/master/server/node) and made compatible with Expressjs 
+* The code is borrowed from [here](https://github.com/blueimp/jQuery-File-Upload/tree/master/server/node) and made compatible with Expressjs 
 
   [![Build Status](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs.svg?branch=master)](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs)
 *****
