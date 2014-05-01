@@ -3,7 +3,6 @@ module.exports = function (opts) {
         fs = require('fs'),
         _existsSync = fs.existsSync || path.existsSync,
         formidable = require('formidable'),
-        imageMagick = require('imagemagick'),
         nameCountRegexp = /(?:(?: \(([\d]+)\))?(\.[^.]+))?$/,
 
         options = {
@@ -43,6 +42,22 @@ module.exports = function (opts) {
                 cache: opts.nodeStatic.cache || 3600 // seconds to cache served files
             }
         };
+
+        checkExists(options.tmpDir);
+        checkExists(options.publicDir);
+        checkExists(options.uploadDir);
+        checkExists(options.uploadDir+'/thumbnail');
+
+        // check if upload folders exists
+        function checkExists(dir)
+        {
+            fs.exists(dir, function(exists){
+                if(!exists)
+                {
+                     throw new Error(dir + ' does not exists. Please create the folder');
+                }
+            });
+        }
 
     var utf8encode = function (str) {
         return unescape(encodeURIComponent(str));
@@ -167,20 +182,13 @@ module.exports = function (opts) {
                 Object.keys(options.imageVersions).forEach(function (version) {
                     counter += 1;
                     var opts = options.imageVersions[version];
-                    /*imageMagick.resize({
-                        width: opts.width,
-                        height: opts.height,
-                        srcPath: options.uploadDir + '/' + fileInfo.name,
-                        dstPath: options.uploadDir + '/' + version + '/' +
-                            fileInfo.name
-                    }, finish);*/
                     if (options.copyImgAsThumb) {
                         fs.readFile(options.uploadDir + '/' + fileInfo.name, function (err, data) {
                             if (err) throw err;
                             fs.writeFile(options.uploadDir + '/' + version + '/' +
                                 fileInfo.name, data, function (err, stderr, stdout) {
                                     if (err) throw err;
-                                    console.log(err, stderr, stdout)
+                                    //console.log(err, stderr, stdout)
                                     finish();
                                 });
                         });
