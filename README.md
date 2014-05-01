@@ -28,7 +28,7 @@ router.post('/upload', function(req, res) {
     });
 });
 
-router.delete('/upload/:name', function(req, res) {
+router.delete('/uploaded/files/:name', function(req, res) { // this Should be the uploadUrl path
      uploader.delete(req, res, function (files) {
         res.send(JSON.stringify(files)); 
     });
@@ -46,6 +46,7 @@ options = {
     minFileSize: 1,
     maxFileSize: 10000000000, // 10 GB
     acceptFileTypes: /.+/i,
+    copyImgAsThumb : true, // this will copy the original image as a thumbnail as preview - temp fix for thumbnail.
     // Files not matched by this regular expression force a download dialog,
     // to prevent executing any scripts in the context of the service domain:
     inlineFileTypes: /\.(gif|jpe?g|png)$/i,
@@ -80,6 +81,7 @@ var options = {
     minFileSize: 1,
     maxFileSize: 10000000000, // 10 GB
     acceptFileTypes: /.+/i,
+    copyImgAsThumb : true, // this will copy the original image as a thumbnail for preview - temp fix for thumbnail.
     // Files not matched by this regular expression force a download dialog,
     // to prevent executing any scripts in the context of the service domain:
     inlineFileTypes: /\.(gif|jpe?g|png)$/i,

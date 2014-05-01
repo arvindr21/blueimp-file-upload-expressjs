@@ -15,6 +15,7 @@ module.exports = function (opts) {
             minFileSize: opts.minFileSize || 1,
             maxFileSize: opts.maxFileSize || 10000000000, // 10 GB
             acceptFileTypes: opts.acceptFileTypes || /.+/i,
+            copyImgAsThumb: opts.copyImgAsThumb || true,
             // Files not matched by this regular expression force a download dialog,
             // to prevent executing any scripts in the context of the service domain:
             inlineFileTypes: opts.inlineFileTypes || /\.(gif|jpe?g|png)$/i,
@@ -31,8 +32,8 @@ module.exports = function (opts) {
                 allowHeaders: opts.accessControl.allowHeaders || 'Content-Type, Content-Range, Content-Disposition'
             },
             /* Uncomment and edit this section to provide the service via HTTPS:
-			// You need to manually uncomment and pass the value. Options does not have 
-			// a placeholder for these 2.
+            // You need to manually uncomment and pass the value. Options does not have 
+            // a placeholder for these 2.
             ssl: {
                 key: fs.readFileSync('/Applications/XAMPP/etc/ssl.key/server.key'),
                 cert: fs.readFileSync('/Applications/XAMPP/etc/ssl.crt/server.crt')
@@ -55,7 +56,7 @@ module.exports = function (opts) {
         this.type = file.type;
         this.deleteType = 'DELETE';
     };
-    
+
     FileInfo.prototype.safeName = function () {
         // Prevent directory traversal and creating hidden system files:
         this.name = path.basename(this.name).replace(/^\.+/, '');
@@ -81,7 +82,7 @@ module.exports = function (opts) {
             });
         }
     };
-    
+
     FileInfo.prototype.validate = function () {
         if (options.minFileSize && options.minFileSize > this.size) {
             this.error = 'File is too small';
@@ -123,7 +124,7 @@ module.exports = function (opts) {
     };
 
     fileUploader.post = function (req, res, callback) {
-    	setNoCacheHeaders(res);
+        setNoCacheHeaders(res);
         var form = new formidable.IncomingForm(),
             tmpFiles = [],
             files = [],
@@ -173,7 +174,17 @@ module.exports = function (opts) {
                         dstPath: options.uploadDir + '/' + version + '/' +
                             fileInfo.name
                     }, finish);*/
-                	finish();
+                    if (options.copyImgAsThumb) {
+                        fs.readFile(options.uploadDir + '/' + fileInfo.name, function (err, data) {
+                            if (err) throw err;
+                            fs.writeFile(options.uploadDir + '/' + version + '/' +
+                                fileInfo.name, data, function (err, stderr, stdout) {
+                                    if (err) throw err;
+                                    console.log(err, stderr, stdout)
+                                    finish();
+                                });
+                        });
+                    }
                 });
             }
         }).on('aborted', function () {
@@ -196,14 +207,20 @@ module.exports = function (opts) {
             if (fileName[0] !== '.') {
                 fs.unlink(options.uploadDir + '/' + fileName, function (ex) {
                     Object.keys(options.imageVersions).forEach(function (version) {
-                        fs.unlink(options.uploadDir + '/' + version + '/' + fileName);
+                        fs.unlink(options.uploadDir + '/' + version + '/' + fileName, function (err) {
+                            //if (err) throw err;
+                        });
                     });
-                    callback({success: !ex});
+                    callback({
+                        success: !ex
+                    });
                 });
                 return;
             }
         }
-        callback({success: false});
+        callback({
+            success: false
+        });
     };
 
     return fileUploader;

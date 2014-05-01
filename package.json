@@ -1,7 +1,7 @@
 {
   "name": "blueimp-file-upload-expressjs",
-  "version": "0.1.1",
-  "description": "jQuery File Upload using Expressjs 'borrowed' from https://github.com/blueimp/jQuery-File-Upload",
+  "version": "0.1.5",
+  "description": "jQuery File Upload using Expressjs : 'borrowed' from Blueimp jQuery File Upload developed by Sebastian Tschan",
   "main": "index.js",
   "scripts": {
     "test": "jasmine-node specs/"
