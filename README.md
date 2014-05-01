@@ -129,9 +129,12 @@ As of now, I have not added the options for SSL support. If you need SSL support
 
 ## Todo
 
--> Write Complete Tests
+* Write Complete Tests
+* Fix Thumbnail creation when uploading images with a more 'feasible' appraoch
+* Add reizing, croping and other filter effects 
+* Amazon S3 Intergartion 
+* Azure Integration
 
--> Fix Thumbnail creation when uploading images with a more 'feasible' appraoch
 
 ***
 ## License
