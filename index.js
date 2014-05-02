@@ -29,7 +29,7 @@ module.exports = function (opts) {
                 allowOrigin: opts.accessControl.allowOrigin || '*',
                 allowMethods: opts.accessControl.allowMethods || 'OPTIONS, HEAD, GET, POST, PUT, DELETE',
                 allowHeaders: opts.accessControl.allowHeaders || 'Content-Type, Content-Range, Content-Disposition'
-            },
+            }
             /* Uncomment and edit this section to provide the service via HTTPS:
             // You need to manually uncomment and pass the value. Options does not have 
             // a placeholder for these 2.
@@ -38,9 +38,6 @@ module.exports = function (opts) {
                 cert: fs.readFileSync('/Applications/XAMPP/etc/ssl.crt/server.crt')
             },
             */
-            nodeStatic: {
-                cache: opts.nodeStatic.cache || 3600 // seconds to cache served files
-            }
         };
 
         checkExists(options.tmpDir);

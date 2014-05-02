@@ -59,9 +59,6 @@ options = {
         allowOrigin: '*',
         allowMethods: 'OPTIONS, HEAD, GET, POST, PUT, DELETE',
         allowHeaders: 'Content-Type, Content-Range, Content-Disposition'
-    },
-    nodeStatic: {
-        cache: 3600 // seconds to cache served files
     }
 };
 ```
@@ -91,9 +88,6 @@ var options = {
         allowOrigin: '*',
         allowMethods: 'OPTIONS, HEAD, GET, POST, PUT, DELETE',
         allowHeaders: 'Content-Type, Content-Range, Content-Disposition'
-    },
-    nodeStatic: {
-        cache: 3600 // seconds to cache served files
     }
 };
 
