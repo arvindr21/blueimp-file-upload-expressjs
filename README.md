@@ -5,8 +5,6 @@
 * [Demo](http://expressjs-fileupload.cloudno.de/)
 * [Tutorial](http://thejackalofjavascript.com/uploading-files-made-fun)
 
-[![NPM](https://nodei.co/npm/blueimp-file-upload-expressjs.png?downloads=true&stars=true)](https://nodei.co/npm/blueimp-file-upload-expressjs/)
-
 [![Build Status](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs.svg?branch=master)](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs)
 
 ## Features
