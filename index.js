@@ -2,12 +2,13 @@ module.exports = function (opts) {
     var path = require('path'),
         fs = require('fs'),
         _existsSync = fs.existsSync || path.existsSync,
+        mkdirp = require('mkdirp'),
+        AWS = require('aws-sdk'),
         formidable = require('formidable'),
         nameCountRegexp = /(?:(?: \(([\d]+)\))?(\.[^.]+))?$/,
-
+        s3,
         options = {
             tmpDir: opts.tmpDir || __dirname + '/tmp',
-            publicDir: opts.publicDir || __dirname + '/public',
             uploadDir: opts.uploadDir || __dirname + '/public/files',
             uploadUrl: opts.uploadUrl || '/files/',
             maxPostSize: opts.maxPostSize || 11000000000, // 11 GB
@@ -15,21 +16,31 @@ module.exports = function (opts) {
             maxFileSize: opts.maxFileSize || 10000000000, // 10 GB
             acceptFileTypes: opts.acceptFileTypes || /.+/i,
             copyImgAsThumb: opts.copyImgAsThumb || true,
+            UUIDRegex : /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
             // Files not matched by this regular expression force a download dialog,
             // to prevent executing any scripts in the context of the service domain:
-            inlineFileTypes: opts.inlineFileTypes || /\.(gif|jpe?g|png)$/i,
-            imageTypes: opts.imageTypes || /\.(gif|jpe?g|png)$/i,
+            inlineFileTypes: opts.inlineFileTypes || /\.(gif|jpe?g|png)/i,
+            imageTypes: opts.imageTypes || /\.(gif|jpe?g|png)/i,
             imageVersions: {
                 'thumbnail': {
-                    width: opts.imageVersions.width || 80,
-                    height: opts.imageVersions.height || 80
+                    width: (opts.imageVersions && opts.imageVersions.width) ? opts.imageVersions.width : 80,
+                    height: (opts.imageVersions && opts.imageVersions.height) ? opts.imageVersions.height : 80
                 }
             },
             accessControl: {
-                allowOrigin: opts.accessControl.allowOrigin || '*',
-                allowMethods: opts.accessControl.allowMethods || 'OPTIONS, HEAD, GET, POST, PUT, DELETE',
-                allowHeaders: opts.accessControl.allowHeaders || 'Content-Type, Content-Range, Content-Disposition'
-            }
+                allowOrigin: (opts.accessControl && opts.accessControl.allowOrigin) ? opts.accessControl.allowOrigin : '*',
+                allowMethods: (opts.accessControl && opts.accessControl.allowMethods) ? opts.accessControl.allowMethods : 'OPTIONS, HEAD, GET, POST, PUT, DELETE',
+                allowHeaders: (opts.accessControl && opts.accessControl.allowHeaders) ? opts.accessControl.allowHeaders : 'Content-Type, Content-Range, Content-Disposition'
+            },
+            storage : {
+                type : (opts.storage && opts.storage.type) ? opts.storage.type : "local",
+                aws : {
+                    accessKeyId : (opts.storage && opts.storage.aws && opts.storage.aws.accessKeyId) ? opts.storage.aws.accessKeyId : null,
+                    secretAccessKey : (opts.storage && opts.storage.aws && opts.storage.aws.secretAccessKey) ? opts.storage.aws.secretAccessKey : null,
+                    bucketName : (opts.storage && opts.storage.aws && opts.storage.aws.bucketName) ? opts.storage.aws.bucketName : null,
+                    acl : (opts.storage && opts.storage.aws && opts.storage.aws.acl) ? opts.storage.aws.acl : 'public-read'
+                }
+            } 
             /* Uncomment and edit this section to provide the service via HTTPS:
             // You need to manually uncomment and pass the value. Options does not have 
             // a placeholder for these 2.
@@ -40,21 +51,77 @@ module.exports = function (opts) {
             */
         };
 
+
+    if(options.storage.type === "local")
+    {
         checkExists(options.tmpDir);
-        checkExists(options.publicDir);
         checkExists(options.uploadDir);
         checkExists(options.uploadDir+'/thumbnail');
-
-        // check if upload folders exists
-        function checkExists(dir)
+    }
+    else if(opts.storage.type === "aws")
+    {
+        if(!opts.storage.aws.accessKeyId || !opts.storage.aws.secretAccessKey || !opts.storage.aws.bucketName)
         {
-            fs.exists(dir, function(exists){
-                if(!exists)
-                {
-                     throw new Error(dir + ' does not exists. Please create the folder');
-                }
-            });
+            throw new Error("Please enter valid AWS S3 details");
         }
+        else
+        {
+            // init aws
+            AWS.config.update({accessKeyId: options.storage.aws.accessKeyId, secretAccessKey: options.storage.aws.secretAccessKey});
+            s3 = new AWS.S3({computeChecksums: true});
+        }
+    }
+
+    // AWS Random UUID
+    /* https://gist.github.com/jed/982883#file-index-js */
+    function b(a){return a?(a^Math.random()*16>>a/4).toString(16):([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,b)}
+
+
+    // check if upload folders exists
+    function checkExists(dir)
+    {
+        fs.exists(dir, function(exists){
+            if(!exists)
+            {
+                mkdirp(dir, function (err) {
+                    if (err) console.error(err)
+                    else console.log("The uploads folder was not present, we have created it for you ["+dir+"]");
+                });
+                 //throw new Error(dir + ' does not exists. Please create the folder');
+            }
+        });
+    }
+
+    function getContentTypeByFile(fileName) {
+      var rc = 'application/octet-stream';
+      var fn = fileName.toLowerCase();
+
+      if (fn.indexOf('.html') >= 0) rc = 'text/html';
+      else if (fn.indexOf('.css') >= 0) rc = 'text/css';
+      else if (fn.indexOf('.json') >= 0) rc = 'application/json';
+      else if (fn.indexOf('.js') >= 0) rc = 'application/x-javascript';
+      else if (fn.indexOf('.png') >= 0) rc = 'image/png';
+      else if (fn.indexOf('.jpg') >= 0) rc = 'image/jpg';
+
+      return rc;
+    }
+
+    function uploadFile(remoteFilename, fileName, callback) {
+      var fileBuffer = fs.readFileSync(fileName);
+      var metaData = getContentTypeByFile(fileName);
+      
+      s3.putObject({
+        ACL: options.storage.aws.acl,
+        Bucket: options.storage.aws.bucketName,
+        Key: remoteFilename,
+        Body: fileBuffer,
+        ContentType: metaData
+      }, function(error, response) {
+        var params = {Bucket: options.storage.aws.bucketName, Key: remoteFilename};
+        var url = s3.getSignedUrl('getObject', params);
+        callback({ url : url}); 
+      });   
+    }
 
     var utf8encode = function (str) {
         return unescape(encodeURIComponent(str));
@@ -78,20 +145,34 @@ module.exports = function (opts) {
         }
     };
 
-    FileInfo.prototype.initUrls = function (req) {
+    FileInfo.prototype.initUrls = function (req, sss) {
         if (!this.error) {
-            var that = this,
-                baseUrl = (options.ssl ? 'https:' : 'http:') +
-                '//' + req.headers.host + options.uploadUrl;
-            this.url = this.deleteUrl = baseUrl + encodeURIComponent(this.name);
-            Object.keys(options.imageVersions).forEach(function (version) {
-                if (_existsSync(
-                    options.uploadDir + '/' + version + '/' + that.name
-                )) {
-                    that[version + 'Url'] = baseUrl + version + '/' +
-                        encodeURIComponent(that.name);
+            var that = this;
+            if(!sss)
+            {
+                var baseUrl = (options.ssl ? 'https:' : 'http:') +
+                    '//' + req.headers.host + options.uploadUrl;
+                that.url =  baseUrl + encodeURIComponent(that.name);
+                that.deleteUrl = baseUrl +encodeURIComponent(that.name);
+                Object.keys(options.imageVersions).forEach(function (version) {
+                    if (_existsSync(
+                            options.uploadDir+ '/' + version + '/' + that.name
+                    )) {
+                        that[version + 'Url'] = baseUrl + version + '/' +
+                            encodeURIComponent(that.name);
+                    }
+                });
+            }
+            else{
+                that.url = sss.url;
+                that.deleteUrl = options.uploadUrl + sss.url.split('/')[sss.url.split('/').length - 1].split('?')[0];
+                if(options.imageTypes.test(sss.url))
+                {
+                    Object.keys(options.imageVersions).forEach(function (version) {
+                        that[version+'Url'] = sss.url;
+                    }); 
                 }
-            });
+            }
         }
     };
 
@@ -116,23 +197,56 @@ module.exports = function (opts) {
     fileUploader.get = function (req, res, callback) {
         setNoCacheHeaders(res);
         var files = [];
-        fs.readdir(options.uploadDir, function (err, list) {
-            list.forEach(function (name) {
-                var stats = fs.statSync(options.uploadDir + '/' + name),
-                    fileInfo;
-                if (stats.isFile() && name[0] !== '.') {
+        if(options.storage.type == 'local')
+        {
+            fs.readdir(options.uploadDir, function (err, list) {
+                list.forEach(function (name) {
+                    var stats = fs.statSync(options.uploadDir + '/' + name),
+                        fileInfo;
+                    if (stats.isFile() && name[0] !== '.') {
+                        fileInfo = new FileInfo({
+                            name: name,
+                            size: stats.size
+                        });
+                        fileInfo.initUrls(req);
+                        files.push(fileInfo);
+                    }
+                });
+                callback({
+                    files: files
+                });
+            });
+        }
+        else if(options.storage.type == 'aws')
+        {
+            var params = {
+              Bucket: options.storage.aws.bucketName, // required
+              //Delimiter: 'STRING_VALUE',
+              //EncodingType: 'url',
+              //Marker: 'STRING_VALUE',
+              //MaxKeys: 0,
+              //Prefix: 'STRING_VALUE',
+            };
+            s3.listObjects(params, function(err, data) {
+              if (err) console.log(err, err.stack); // an error occurred
+              //else     console.log(data);           // successful response
+
+              data.Contents.forEach(function(o){
                     fileInfo = new FileInfo({
-                        name: name,
-                        size: stats.size
+                        name: options.UUIDRegex.test(o.Key) ? o.Key.split('__')[1] : o.Key,
+                        size: o.Size
                     });
-                    fileInfo.initUrls(req);
+                    sss = {url : (options.ssl ? 'https:' : 'http:')+'//s3.amazonaws.com/'+options.storage.aws.bucketName+'/'+o.Key }
+                    fileInfo.initUrls(req, sss);
                     files.push(fileInfo);
-                }
+
+              });
+              
+                callback({
+                    files: files
+                });
             });
-            callback({
-                files: files
-            });
-        });
+        }
     };
 
     fileUploader.post = function (req, res, callback) {
@@ -143,11 +257,11 @@ module.exports = function (opts) {
             map = {},
             counter = 1,
             redirect,
-            finish = function () {
+            finish = function (sss) {
                 counter -= 1;
                 if (!counter) {
                     files.forEach(function (fileInfo) {
-                        fileInfo.initUrls(req);
+                        fileInfo.initUrls(req, sss);
                     });
                     callback({
                         files: files
@@ -174,8 +288,11 @@ module.exports = function (opts) {
                 fs.unlink(file.path);
                 return;
             }
-            fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
-            if (options.imageTypes.test(fileInfo.name)) {
+            // part ways here
+            if(options.storage.type == 'local')
+            {
+                fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
+                if (options.imageTypes.test(fileInfo.name)) {
                 Object.keys(options.imageVersions).forEach(function (version) {
                     counter += 1;
                     var opts = options.imageVersions[version];
@@ -192,6 +309,13 @@ module.exports = function (opts) {
                     }
                 });
             }
+            }
+            else if(options.storage.type == 'aws')
+            {
+                uploadFile((b()+'__'+fileInfo.name), file.path, function(sss){
+                    finish(sss);
+                });
+            }
         }).on('aborted', function () {
             tmpFiles.forEach(function (file) {
                 fs.unlink(file);
@@ -202,30 +326,54 @@ module.exports = function (opts) {
             if (bytesReceived > options.maxPostSize) {
                 req.connection.destroy();
             }
-        }).on('end', finish).parse(req);
+        }).on('end', function(){
+            if(options.storage.type == 'local')
+            {
+                finish();   
+            }
+            // finish();
+        }).parse(req);
     };
 
     fileUploader.delete = function (req, res, callback) {
         var fileName;
-        if (req.url.slice(0, options.uploadUrl.length) === options.uploadUrl) {
-            fileName = path.basename(decodeURIComponent(req.url));
-            if (fileName[0] !== '.') {
-                fs.unlink(options.uploadDir + '/' + fileName, function (ex) {
-                    Object.keys(options.imageVersions).forEach(function (version) {
-                        fs.unlink(options.uploadDir + '/' + version + '/' + fileName, function (err) {
-                            //if (err) throw err;
+        if(options.storage.type == 'local')
+        {
+            if (req.url.slice(0, options.uploadUrl.length) === options.uploadUrl) {
+                fileName = path.basename(decodeURIComponent(req.url));
+                if (fileName[0] !== '.') {
+                    fs.unlink(options.uploadDir + '/' + fileName, function (ex) {
+                        Object.keys(options.imageVersions).forEach(function (version) {
+                            fs.unlink(options.uploadDir + '/' + version + '/' + fileName, function (err) {
+                                //if (err) throw err;
+                            });
+                        });
+                        callback({
+                            success: !ex
                         });
                     });
-                    callback({
-                        success: !ex
-                    });
-                });
-                return;
+                    return;
+                }
             }
+            callback({
+                success: false
+            });
         }
-        callback({
-            success: false
-        });
+        else if(options.storage.type == 'aws')
+        {
+            var params = {
+              Bucket: options.storage.aws.bucketName, // required
+              Key: decodeURIComponent(req.url.split('/')[req.url.split('/').length - 1]) // required
+            };
+            console.log(params);
+            s3.deleteObject(params, function(err, data) {
+              if (err) console.log(err, err.stack); // an error occurred
+              else     console.log(data);           // successful response
+                  callback({
+                    success: data
+                });
+            });
+        }
     };
 
     return fileUploader;
