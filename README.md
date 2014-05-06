@@ -10,7 +10,7 @@
 ## Features
 * Upload to server
 * Upload to AWS
-* Client already available [here](http://blueimp.github.io/jQuery-File-Upload/)
+* Client available [here](http://blueimp.github.io/jQuery-File-Upload/)
 
 ## Installation
 
