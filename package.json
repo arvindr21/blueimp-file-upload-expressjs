@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "formidable" : "*",
-    "jasmine-node" : "latest"
+    "jasmine-node" : "latest",
+    "mkdirp": "latest",
+    "aws-sdk": "latest"
   },
   "repository": {
     "type": "git",
