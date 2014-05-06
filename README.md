@@ -1,11 +1,14 @@
 # Blueimp file upload for Express js
 
+[![NPM](https://nodei.co/npm/blueimp-file-upload-expressjs.png?downloads=true)](https://nodei.co/npm/blueimp-file-upload-expressjs/)
+
+[![Build Status](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs.svg?branch=master)](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs)
+
 * A simple express module for integrating jQuery File Upload.
 * The code is borrowed from [here](https://github.com/blueimp/jQuery-File-Upload/tree/master/server/node) and made compatible with Expressjs 
 * [Demo](http://expressjs-fileupload.cloudno.de/)
 * [Tutorial](http://thejackalofjavascript.com/uploading-files-made-fun)
 
-[![Build Status](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs.svg?branch=master)](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs)
 
 ## Features
 * Upload to server
