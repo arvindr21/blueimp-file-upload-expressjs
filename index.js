@@ -1,9 +1,4 @@
 module.exports = function (opts) {
-    var thumb;
-    if(opts.copyImgAsThumb)
-        thumb = true;
-    else
-        thumb = false;
     var path = require('path'),
         fs = require('fs'),
         _existsSync = fs.existsSync || path.existsSync,
@@ -20,7 +15,7 @@ module.exports = function (opts) {
             minFileSize: opts.minFileSize || 1,
             maxFileSize: opts.maxFileSize || 10000000000, // 10 GB
             acceptFileTypes: opts.acceptFileTypes || /.+/i,
-            copyImgAsThumb: thumb,
+            copyImgAsThumb: opts.copyImgAsThumb && true,
             UUIDRegex : /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
             // Files not matched by this regular expression force a download dialog,
             // to prevent executing any scripts in the context of the service domain:
