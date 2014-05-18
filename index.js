@@ -1,4 +1,9 @@
 module.exports = function (opts) {
+    var thumb;
+    if(opts.copyImgAsThumb)
+        thumb = true;
+    else
+        thumb = false;
     var path = require('path'),
         fs = require('fs'),
         _existsSync = fs.existsSync || path.existsSync,
@@ -15,7 +20,7 @@ module.exports = function (opts) {
             minFileSize: opts.minFileSize || 1,
             maxFileSize: opts.maxFileSize || 10000000000, // 10 GB
             acceptFileTypes: opts.acceptFileTypes || /.+/i,
-            copyImgAsThumb: opts.copyImgAsThumb || true,
+            copyImgAsThumb: thumb,
             UUIDRegex : /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
             // Files not matched by this regular expression force a download dialog,
             // to prevent executing any scripts in the context of the service domain:
@@ -292,7 +297,7 @@ module.exports = function (opts) {
             if(options.storage.type == 'local')
             {
                 fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
-                if (options.imageTypes.test(fileInfo.name)) {
+                if (options.copyImgAsThumb && options.imageTypes.test(fileInfo.name)) {
                 Object.keys(options.imageVersions).forEach(function (version) {
                     counter += 1;
                     var opts = options.imageVersions[version];
