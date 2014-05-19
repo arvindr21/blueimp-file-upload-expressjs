@@ -56,7 +56,7 @@ module.exports = function (opts) {
     {
         checkExists(options.tmpDir);
         checkExists(options.uploadDir);
-        checkExists(options.uploadDir+'/thumbnail');
+        if(options.copyImgAsThumb) checkExists(options.uploadDir+'/thumbnail');
     }
     else if(opts.storage.type === "aws")
     {
