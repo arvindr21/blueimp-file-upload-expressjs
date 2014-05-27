@@ -49,12 +49,13 @@ options = {
         aws : {
             accessKeyId :  'xxxxxxxxxxxxxxxxx', // required if aws
             secretAccessKey : 'xxxxxxxxxxxxxxxxxxxxxxx', // required if aws
+            region : 'us-west-2', //make sure you know the region, else leave this option out
             bucketName : 'xxxxxxxxx' // required if aws
         }
     }
 };
-```
 
+```
 ## Usage with options 
 (*refer tutorial*)
 ```js
@@ -85,6 +86,7 @@ var options = {
         aws : {
             accessKeyId :  'xxxxxxxxxxxxxxxxx',
             secretAccessKey : 'xxxxxxxxxxxxxxxxx',
+            region : 'us-east-1',//make sure you know the region, else leave this option out
             bucketName : 'xxxxxxxxxxxxxxxxx'
         }
     }

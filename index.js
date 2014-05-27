@@ -37,6 +37,7 @@ module.exports = function (opts) {
                 aws : {
                     accessKeyId : (opts.storage && opts.storage.aws && opts.storage.aws.accessKeyId) ? opts.storage.aws.accessKeyId : null,
                     secretAccessKey : (opts.storage && opts.storage.aws && opts.storage.aws.secretAccessKey) ? opts.storage.aws.secretAccessKey : null,
+                    region : (opts.storage && opts.storage.aws && opts.storage.aws.region) ? opts.storage.aws.region : null,
                     bucketName : (opts.storage && opts.storage.aws && opts.storage.aws.bucketName) ? opts.storage.aws.bucketName : null,
                     acl : (opts.storage && opts.storage.aws && opts.storage.aws.acl) ? opts.storage.aws.acl : 'public-read'
                 }
@@ -67,7 +68,11 @@ module.exports = function (opts) {
         else
         {
             // init aws
-            AWS.config.update({accessKeyId: options.storage.aws.accessKeyId, secretAccessKey: options.storage.aws.secretAccessKey});
+            AWS.config.update({
+                accessKeyId: options.storage.aws.accessKeyId, 
+                secretAccessKey: options.storage.aws.secretAccessKey
+            });
+            if(options.storage.aws.region) AWS.config.region = options.storage.aws.region;
             s3 = new AWS.S3({computeChecksums: true});
         }
     }
