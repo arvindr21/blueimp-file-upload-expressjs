@@ -16,6 +16,7 @@ module.exports = function (opts) {
             maxFileSize: opts.maxFileSize || 10000000000, // 10 GB
             acceptFileTypes: opts.acceptFileTypes || /.+/i,
             copyImgAsThumb: opts.copyImgAsThumb && true,
+            useSSL: opts.useSSL || false,
             UUIDRegex : /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/,
             // Files not matched by this regular expression force a download dialog,
             // to prevent executing any scripts in the context of the service domain:
@@ -41,15 +42,7 @@ module.exports = function (opts) {
                     bucketName : (opts.storage && opts.storage.aws && opts.storage.aws.bucketName) ? opts.storage.aws.bucketName : null,
                     acl : (opts.storage && opts.storage.aws && opts.storage.aws.acl) ? opts.storage.aws.acl : 'public-read'
                 }
-            } 
-            /* Uncomment and edit this section to provide the service via HTTPS:
-            // You need to manually uncomment and pass the value. Options does not have 
-            // a placeholder for these 2.
-            ssl: {
-                key: fs.readFileSync('/Applications/XAMPP/etc/ssl.key/server.key'),
-                cert: fs.readFileSync('/Applications/XAMPP/etc/ssl.crt/server.crt')
-            },
-            */
+            }
         };
 
 
@@ -155,7 +148,7 @@ module.exports = function (opts) {
             var that = this;
             if(!sss)
             {
-                var baseUrl = (options.ssl ? 'https:' : 'http:') +
+                var baseUrl = (options.useSSL ? 'https:' : 'http:') +
                     '//' + req.headers.host + options.uploadUrl;
                 that.url =  baseUrl + encodeURIComponent(that.name);
                 that.deleteUrl = baseUrl +encodeURIComponent(that.name);
@@ -241,7 +234,7 @@ module.exports = function (opts) {
                         name: options.UUIDRegex.test(o.Key) ? o.Key.split('__')[1] : o.Key,
                         size: o.Size
                     });
-                    sss = {url : (options.ssl ? 'https:' : 'http:')+'//s3.amazonaws.com/'+options.storage.aws.bucketName+'/'+o.Key }
+                    sss = {url : (options.useSSL ? 'https:' : 'http:')+'//s3.amazonaws.com/'+options.storage.aws.bucketName+'/'+o.Key }
                     fileInfo.initUrls(req, sss);
                     files.push(fileInfo);
 
