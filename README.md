@@ -123,8 +123,8 @@ module.exports = function (router) {
 ```
 ## SSL Support
 
-Set the `useSSL` option to `true` to use the package with an Express [HTTPS server](http://expressjs.com/4x/api.html#app.listen).
-```
+Set the `useSSL` option to `true` to use the package with an [HTTPS server](http://expressjs.com/4x/api.html#app.listen).
+```js
 var express = require('express')
 var fs = require('fs')
 var https = require('https');
