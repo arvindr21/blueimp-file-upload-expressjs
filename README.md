@@ -123,8 +123,38 @@ module.exports = function (router) {
 ```
 ## SSL Support
 
-As of now, I have not added the options for SSL support. If you need SSL support, fork this repo and in index.js, uncomment the SSL section.
+Set the `useSSL` option to `true` to use the package with an Express [HTTPS server](http://expressjs.com/4x/api.html#app.listen).
+```
+var express = require('express')
+var fs = require('fs')
+var https = require('https');
 
+var app = express()
+
+// config the uploader
+var options = {
+    ...
+    useSSL: true
+    ...
+};
+
+// init the uploader
+var uploader = require('blueimp-file-upload-expressjs')(options);
+
+app.get('/upload', function(req, res) {
+    uploader.get(req, res, function (obj) {
+    res.send(JSON.stringify(obj)); 
+})
+    .post('/upload', // ...
+    .delete('/uploaded/files/:name', // ...
+
+// create the HTTPS server
+var app_key = fs.readFileSync('key.pem');
+var app_cert = fs.readFileSync('cert.pem');
+
+https.createServer({key: app_key, cert: app_cert}, app).listen(443);
+
+```
 
 ## Todo
 
