@@ -163,6 +163,7 @@ https.createServer({key: app_key, cert: app_cert}, app).listen(443);
 * Add reizing, croping and other filter effects 
 * ~~Amazon S3 Intergartion~~
 * Azure Integration
+* ~~SSL SUpport~~
 
 ***
 ## License
