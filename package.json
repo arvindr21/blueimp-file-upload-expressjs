@@ -12,7 +12,7 @@
     "aws-sdk": "^2.0.0-rc.19"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.2",
+    "jasmine-node": "1.14.2"
   }
   "repository": {
     "type": "git",
