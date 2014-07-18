@@ -201,7 +201,7 @@ module.exports = function (opts) {
                 list.forEach(function (name) {
                     var stats = fs.statSync(options.uploadDir + '/' + name),
                         fileInfo;
-                    if (stats.isFile() && name[0] !== '.') {
+                    if (stats.isFile() && name[0] !== '.' && options.imageTypes.test(name)) {
                         fileInfo = new FileInfo({
                             name: name,
                             size: stats.size
