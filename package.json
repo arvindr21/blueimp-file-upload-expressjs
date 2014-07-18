@@ -9,9 +9,11 @@
   "dependencies": {
     "formidable": "^1.0.14",
     "mkdirp": "^0.5.0",
-    "jasmine-node": "^1.14.3",
     "aws-sdk": "^2.0.0-rc.19"
   },
+  "devDependencies": {
+    "jasmine-node": "1.14.2",
+  }
   "repository": {
     "type": "git",
     "url": "https://github.com/arvindr21/blueimp-file-upload-expressjs.git"
