@@ -105,14 +105,14 @@ module.exports = function (opts) {
     }
 
     function uploadFile(remoteFilename, fileName, callback) {
-      var fileBuffer = fs.readFileSync(fileName);
+      var fileStream = fs.createReadStream(fileName);
       var metaData = getContentTypeByFile(fileName);
       
       s3.putObject({
         ACL: options.storage.aws.acl,
         Bucket: options.storage.aws.bucketName,
         Key: remoteFilename,
-        Body: fileBuffer,
+        Body: fileStream,
         ContentType: metaData
       }, function(error, response) {
         var params = {Bucket: options.storage.aws.bucketName, Key: remoteFilename};
