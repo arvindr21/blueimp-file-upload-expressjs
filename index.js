@@ -252,6 +252,7 @@ module.exports = function (opts) {
         var form = new formidable.IncomingForm(),
             tmpFiles = [],
             files = [],
+            formData = {},
             map = {},
             counter = 1,
             redirect,
@@ -262,7 +263,8 @@ module.exports = function (opts) {
                         fileInfo.initUrls(req, sss);
                     });
                     callback({
-                        files: files
+                        files: files,
+                        formData: formData
                     }, redirect);
                 }
             };
@@ -278,6 +280,8 @@ module.exports = function (opts) {
         }).on('field', function (name, value) {
             if (name === 'redirect') {
                 redirect = value;
+            } else {
+                formData[name] = value;
             }
         }).on('file', function (name, file) {
             var fileInfo = map[path.basename(file.path)];
