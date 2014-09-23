@@ -104,6 +104,7 @@ module.exports = function(opts) {
     var fileBuffer = fs.readFileSync(fileName);
     var metaData = getContentTypeByFile(fileName);
 
+
     s3.putObject({
       ACL: options.storage.aws.acl,
       Bucket: options.storage.aws.bucketName,
@@ -238,13 +239,13 @@ module.exports = function(opts) {
           files.push(fileInfo);
 
         });
-
         callback({
           files: files
         });
       });
     }
   };
+
 
   fileUploader.post = function(req, res, callback) {
     setNoCacheHeaders(res);
@@ -265,6 +266,7 @@ module.exports = function(opts) {
           }, redirect);
         }
       };
+
 
     form.uploadDir = options.tmpDir;
 
