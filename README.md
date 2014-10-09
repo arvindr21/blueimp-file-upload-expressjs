@@ -16,10 +16,9 @@
 * Client available [here](http://blueimp.github.io/jQuery-File-Upload/)
 
 ## Installation
-
+```js
     $ npm install blueimp-file-upload-expressjs
-
-
+```
 
 ## Options
 ```js
@@ -33,11 +32,10 @@ options = {
     acceptFileTypes: /.+/i,
     inlineFileTypes: /\.(gif|jpe?g|png)/i,
     imageTypes:  /\.(gif|jpe?g|png)/i,
-    imageVersions: {
-        'thumbnail': {
-            width: 80,
-            height: 80
-        }
+    copyImgAsThumb : true, // required
+    imageVersions :{
+        maxWidth : 200,
+        maxHeight : 200
     },
     accessControl: {
         allowOrigin: '*',
@@ -72,9 +70,10 @@ var options = {
     // to prevent executing any scripts in the context of the service domain:
     inlineFileTypes:  /\.(gif|jpe?g|png)/i,
     imageTypes:  /\.(gif|jpe?g|png)/i,
-    imageVersions: {
-        width:  80,
-        height: 80
+    copyImgAsThumb : true, // required
+    imageVersions :{
+        maxWidth : 200,
+        maxHeight : 200
     },
     accessControl: {
         allowOrigin: '*',
@@ -159,8 +158,8 @@ https.createServer({key: app_key, cert: app_cert}, app).listen(443);
 ## Todo
 
 * Write Complete Tests
-* Fix Thumbnail creation when uploading images with a more 'feasible' appraoch
-* Add reizing, croping and other filter effects 
+* ~~Fix Thumbnail creation when uploading images with a more 'feasible' appraoch~~
+* Add reizing, croping and other filter effects
 * ~~Amazon S3 Intergartion~~
 * Azure Integration
 * ~~SSL SUpport~~

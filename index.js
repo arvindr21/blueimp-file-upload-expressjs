@@ -1,6 +1,7 @@
 module.exports = function(opts) {
   var path = require('path'),
     fs = require('fs'),
+    lwip = require('lwip'),
     _existsSync = fs.existsSync || path.existsSync,
     mkdirp = require('mkdirp'),
     AWS = require('aws-sdk'),
@@ -24,8 +25,8 @@ module.exports = function(opts) {
       imageTypes: opts.imageTypes || /\.(gif|jpe?g|png)/i,
       imageVersions: {
         'thumbnail': {
-          width: (opts.imageVersions && opts.imageVersions.width) ? opts.imageVersions.width : 80,
-          height: (opts.imageVersions && opts.imageVersions.height) ? opts.imageVersions.height : 80
+          width: (opts.imageVersions && opts.imageVersions.maxWidth) ? opts.imageVersions.maxWidth : 80,
+          height: (opts.imageVersions && opts.imageVersions.maxHeight) ? opts.imageVersions.maxHeight : 80
         }
       },
       accessControl: {
@@ -156,8 +157,8 @@ module.exports = function(opts) {
         that.deleteUrl = baseUrl + encodeURIComponent(that.name);
         Object.keys(options.imageVersions).forEach(function(version) {
           if (_existsSync(
-            options.uploadDir + '/' + version + '/' + that.name
-          )) {
+              options.uploadDir + '/' + version + '/' + that.name
+            )) {
             that[version + 'Url'] = baseUrl + version + '/' +
               encodeURIComponent(that.name);
           }
@@ -295,16 +296,15 @@ module.exports = function(opts) {
             counter += 1;
             var opts = options.imageVersions[version];
             if (options.copyImgAsThumb) {
-              fs.readFile(options.uploadDir + '/' + fileInfo.name, function(err, data) {
-                if (err) throw err;
-                fs.writeFile(options.uploadDir + '/' + version + '/' +
-                  fileInfo.name, data, function(err, stderr, stdout) {
+              lwip.open(options.uploadDir + '/' + fileInfo.name, function(err, image) {
+                image.batch()
+                  .resize(options.imageVersions.thumbnail.width, options.imageVersions.thumbnail.height) // crop a 200X200 square from center
+                  .writeFile(options.uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
                     if (err) throw err;
-                    //console.log(err, stderr, stdout)
                     finish();
                   });
               });
-            }
+            };
           });
         }
       } else if (options.storage.type == 'aws') {
