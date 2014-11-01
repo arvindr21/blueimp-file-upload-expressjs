@@ -19,7 +19,7 @@
 ```js
     $ npm install blueimp-file-upload-expressjs
 ```
-
+    
 ## Options
 ```js
 options = {
@@ -153,6 +153,75 @@ var app_cert = fs.readFileSync('cert.pem');
 
 https.createServer({key: app_key, cert: app_cert}, app).listen(443);
 
+```
+
+## Multiple thumbnails
+
+To generate multiple thumbnails while uploading
+
+```js
+var options = {
+  tmpDir: __dirname + '/../public/uploaded/tmp',
+  uploadDir: __dirname + '/../public/uploaded/files',
+  uploadUrl: '/uploaded/files/',
+  copyImgAsThumb: true, // required
+  imageVersions: {
+    maxWidth: 200,
+    maxHeight: 200
+  },
+  storage: {
+    type: 'local'
+  }
+};
+```
+`copyImgAsThumb` needs to be set to true. `imageVersions`, `maxWidth` and `maxHeight` will by default create a `thumbnail` folder and place the specified width/height thumbnail in it.
+ 
+Optionally, you can omit the `maxHeight`. In this case, it will be resize proportionally to the specified width. 
+
+```js
+imageVersions: {
+    maxWidth: 200
+  },
+```
+
+also
+
+```js
+imageVersions: {
+    maxWidth: 200,
+    maxHeight : 'auto'
+  },
+```
+PS : `auto` value works only with height.
+
+You can also specify multiple thumbnail generations like 
+
+```js
+var options = {
+  tmpDir: __dirname + '/../public/uploaded/tmp',
+  uploadDir: __dirname + '/../public/uploaded/files',
+  uploadUrl: '/uploaded/files/',
+  copyImgAsThumb: true,
+  imageVersions: {
+    maxWidth: 200,
+    maxHeight: 'auto',
+    "large" : {
+        width : 600,
+        height : 600
+    },
+    "medium" : {
+        width : 300,
+        height : 300
+    },
+    "small" : {
+        width : 150,
+        height : 150
+    }
+  },
+  storage: {
+    type: 'local'
+  }
+};
 ```
 
 ## Todo

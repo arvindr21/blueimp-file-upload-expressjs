@@ -25,8 +25,8 @@ module.exports = function(opts) {
       imageTypes: opts.imageTypes || /\.(gif|jpe?g|png)/i,
       imageVersions: {
         'thumbnail': {
-          width: (opts.imageVersions && opts.imageVersions.maxWidth) ? opts.imageVersions.maxWidth : 80,
-          height: (opts.imageVersions && opts.imageVersions.maxHeight) ? opts.imageVersions.maxHeight : 80
+          width: (opts.imageVersions && opts.imageVersions.maxWidth) ? opts.imageVersions.maxWidth : 99,
+          height: (opts.imageVersions && opts.imageVersions.maxHeight) ? opts.imageVersions.maxHeight : 'auto'
         }
       },
       accessControl: {
@@ -46,11 +46,21 @@ module.exports = function(opts) {
       }
     };
 
+  Object.keys(opts.imageVersions).forEach(function(version) {
+    if (version != 'maxHeight' && version != 'maxWidth') {
+      options.imageVersions[version] = opts.imageVersions[version];
+    }
+  });
+
 
   if (options.storage.type === "local") {
     checkExists(options.tmpDir);
     checkExists(options.uploadDir);
-    if (options.copyImgAsThumb) checkExists(options.uploadDir + '/thumbnail');
+    if (options.copyImgAsThumb) {
+      Object.keys(options.imageVersions).forEach(function(version) {
+        checkExists(options.uploadDir + '/' + version);
+      });
+    }
   } else if (opts.storage.type === "aws") {
     if (!opts.storage.aws.accessKeyId || !opts.storage.aws.secretAccessKey || !opts.storage.aws.bucketName) {
       throw new Error("Please enter valid AWS S3 details");
@@ -297,12 +307,21 @@ module.exports = function(opts) {
             var opts = options.imageVersions[version];
             if (options.copyImgAsThumb) {
               lwip.open(options.uploadDir + '/' + fileInfo.name, function(err, image) {
-                image.batch()
-                  .resize(options.imageVersions.thumbnail.width, options.imageVersions.thumbnail.height) // crop a 200X200 square from center
-                  .writeFile(options.uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
-                    if (err) throw err;
-                    finish();
-                  });
+                if (opts.height == 'auto') {
+                  image.batch()
+                    .resize(opts.width)
+                    .writeFile(options.uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
+                      if (err) throw err;
+                      finish();
+                    });
+                } else {
+                  image.batch()
+                    .resize(opts.width, opts.height)
+                    .writeFile(options.uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
+                      if (err) throw err;
+                      finish();
+                    });
+                }
               });
             };
           });
