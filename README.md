@@ -105,8 +105,11 @@ module.exports = function (router) {
     });
 
     router.post('/upload', function(req, res) {
-      uploader.post(req, res, function (obj) {
+      uploader.post(req, res, function (obj, redirect, error) {
+          if(!error)
+          {
             res.send(JSON.stringify(obj)); 
+          }
       });
       
     });
