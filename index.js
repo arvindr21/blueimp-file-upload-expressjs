@@ -128,7 +128,7 @@ module.exports = function(opts) {
         Key: remoteFilename
       };
       var url = s3.getSignedUrl('getObject', params);
-      callback(error, {
+      callback({
         url: url
       });
     });
@@ -266,13 +266,13 @@ module.exports = function(opts) {
       map = {},
       counter = 1,
       redirect,
-      finish = function(error, sss) {
+      finish = function(sss) {
         counter -= 1;
         if (!counter) {
           files.forEach(function(fileInfo) {
             fileInfo.initUrls(req, sss);
           });
-          callback(error, {
+          callback({
             files: files
           }, redirect);
         }
@@ -327,8 +327,8 @@ module.exports = function(opts) {
           });
         }
       } else if (options.storage.type == 'aws') {
-        uploadFile((b() + '__' + fileInfo.name), file.path, function(error, sss) {
-          finish(error, sss);
+        uploadFile((b() + '__' + fileInfo.name), file.path, function(sss) {
+          finish(sss);
         });
       }
     }).on('aborted', function() {
