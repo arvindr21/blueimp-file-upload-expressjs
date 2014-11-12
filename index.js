@@ -130,7 +130,7 @@ module.exports = function(opts) {
       var url = s3.getSignedUrl('getObject', params);
       callback({
         url: url
-      });
+      },error);
     });
   }
 
@@ -266,7 +266,7 @@ module.exports = function(opts) {
       map = {},
       counter = 1,
       redirect,
-      finish = function(sss) {
+      finish = function(sss, error) {
         counter -= 1;
         if (!counter) {
           files.forEach(function(fileInfo) {
@@ -274,7 +274,7 @@ module.exports = function(opts) {
           });
           callback({
             files: files
-          }, redirect);
+          }, redirect, error);
         }
       };
 
@@ -327,8 +327,8 @@ module.exports = function(opts) {
           });
         }
       } else if (options.storage.type == 'aws') {
-        uploadFile((b() + '__' + fileInfo.name), file.path, function(sss) {
-          finish(sss);
+        uploadFile((b() + '__' + fileInfo.name), file.path, function(sss, error) {
+          finish(sss, error);
         });
       }
     }).on('aborted', function() {
