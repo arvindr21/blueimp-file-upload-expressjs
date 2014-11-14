@@ -46,11 +46,13 @@ module.exports = function(opts) {
       }
     };
 
-  Object.keys(opts.imageVersions).forEach(function(version) {
-    if (version != 'maxHeight' && version != 'maxWidth') {
-      options.imageVersions[version] = opts.imageVersions[version];
-    }
-  });
+  if (opts.imageVersions) {
+    Object.keys(opts.imageVersions).forEach(function(version) {
+      if (version != 'maxHeight' && version != 'maxWidth') {
+        options.imageVersions[version] = opts.imageVersions[version];
+      }
+    });
+  }
 
 
   if (options.storage.type === "local") {
