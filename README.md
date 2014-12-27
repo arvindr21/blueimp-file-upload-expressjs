@@ -18,7 +18,7 @@
 
 ## Installation
 ```js
-    $ npm install blueimp-file-upload-expressjs
+$ npm install blueimp-file-upload-expressjs
 ```
     
 ## Options
@@ -230,7 +230,7 @@ var options = {
 
 ## Todo
 
-* Write Complete Tests
+* Refactor code to build tests
 * ~~Fix Thumbnail creation when uploading images with a more 'feasible' appraoch~~
 * Add reizing, croping and other filter effects
 * ~~Amazon S3 Intergartion~~
