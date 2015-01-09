@@ -359,8 +359,9 @@ module.exports = function(opts) {
     var fileName;
     if (options.storage.type == 'local') {
       var uploadDir = req.param('uploadDir') || options.uploadDir;
-      if (req.url.slice(0, options.uploadUrl.length) === options.uploadUrl) {
-        fileName = path.basename(decodeURIComponent(req.url));
+      var url = req.url.indexOf('?') !== -1 ? req.url.substring(0, req.url.indexOf('?')) : req.url;
+      if (url.slice(0, options.uploadUrl.length) === options.uploadUrl) {
+        fileName = path.basename(decodeURIComponent(url));
         if (fileName[0] !== '.') {
           fs.unlink(uploadDir + '/' + fileName, function(ex) {
             Object.keys(options.imageVersions).forEach(function(version) {
