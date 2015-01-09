@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = function(opts) {
   var path = require('path'),
     fs = require('fs'),
@@ -35,7 +37,7 @@ module.exports = function(opts) {
         allowHeaders: (opts.accessControl && opts.accessControl.allowHeaders) ? opts.accessControl.allowHeaders : 'Content-Type, Content-Range, Content-Disposition'
       },
       storage: {
-        type: (opts.storage && opts.storage.type) ? opts.storage.type : "local",
+        type: (opts.storage && opts.storage.type) ? opts.storage.type : 'local',
         aws: {
           accessKeyId: (opts.storage && opts.storage.aws && opts.storage.aws.accessKeyId) ? opts.storage.aws.accessKeyId : null,
           secretAccessKey: (opts.storage && opts.storage.aws && opts.storage.aws.secretAccessKey) ? opts.storage.aws.secretAccessKey : null,
@@ -55,7 +57,7 @@ module.exports = function(opts) {
   }
 
 
-  if (options.storage.type === "local") {
+  if (options.storage.type === 'local') {
     checkExists(options.tmpDir);
     checkExists(options.uploadDir);
     if (options.copyImgAsThumb) {
@@ -63,9 +65,9 @@ module.exports = function(opts) {
         checkExists(options.uploadDir + '/' + version);
       });
     }
-  } else if (opts.storage.type === "aws") {
+  } else if (opts.storage.type === 'aws') {
     if (!opts.storage.aws.accessKeyId || !opts.storage.aws.secretAccessKey || !opts.storage.aws.bucketName) {
-      throw new Error("Please enter valid AWS S3 details");
+      throw new Error('Please enter valid AWS S3 details');
     } else {
       // init aws
       AWS.config.update({
@@ -92,7 +94,7 @@ module.exports = function(opts) {
       if (!exists) {
         mkdirp(dir, function(err) {
           if (err) console.error(err)
-          else console.log("The uploads folder was not present, we have created it for you [" + dir + "]");
+          else console.log('The uploads folder was not present, we have created it for you [' + dir + ']');
         });
         //throw new Error(dir + ' does not exists. Please create the folder');
       }
@@ -201,7 +203,7 @@ module.exports = function(opts) {
   var setNoCacheHeaders = function(res) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.setHeader('Content-Disposition', 'inline; filename="files.json"');
+    res.setHeader('Content-Disposition', 'inline; filename='files.json'');
   }
   var fileUploader = {};
 
