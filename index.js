@@ -203,7 +203,7 @@ module.exports = function(opts) {
   var setNoCacheHeaders = function(res) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.setHeader('Content-Disposition', 'inline; filename='files.json'');
+    res.setHeader('Content-Disposition', 'inline; filename="files.json"');
   }
   var fileUploader = {};
 
