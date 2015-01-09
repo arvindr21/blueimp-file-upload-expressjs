@@ -1,5 +1,3 @@
-'use strict';
-
 module.exports = function(opts) {
   var path = require('path'),
     fs = require('fs'),
@@ -37,7 +35,7 @@ module.exports = function(opts) {
         allowHeaders: (opts.accessControl && opts.accessControl.allowHeaders) ? opts.accessControl.allowHeaders : 'Content-Type, Content-Range, Content-Disposition'
       },
       storage: {
-        type: (opts.storage && opts.storage.type) ? opts.storage.type : 'local',
+        type: (opts.storage && opts.storage.type) ? opts.storage.type : "local",
         aws: {
           accessKeyId: (opts.storage && opts.storage.aws && opts.storage.aws.accessKeyId) ? opts.storage.aws.accessKeyId : null,
           secretAccessKey: (opts.storage && opts.storage.aws && opts.storage.aws.secretAccessKey) ? opts.storage.aws.secretAccessKey : null,
@@ -57,7 +55,7 @@ module.exports = function(opts) {
   }
 
 
-  if (options.storage.type === 'local') {
+  if (options.storage.type === "local") {
     checkExists(options.tmpDir);
     checkExists(options.uploadDir);
     if (options.copyImgAsThumb) {
@@ -65,9 +63,9 @@ module.exports = function(opts) {
         checkExists(options.uploadDir + '/' + version);
       });
     }
-  } else if (opts.storage.type === 'aws') {
+  } else if (opts.storage.type === "aws") {
     if (!opts.storage.aws.accessKeyId || !opts.storage.aws.secretAccessKey || !opts.storage.aws.bucketName) {
-      throw new Error('Please enter valid AWS S3 details');
+      throw new Error("Please enter valid AWS S3 details");
     } else {
       // init aws
       AWS.config.update({
@@ -84,7 +82,7 @@ module.exports = function(opts) {
   // AWS Random UUID
   /* https://gist.github.com/jed/982883#file-index-js */
   function b(a) {
-    return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b);
+    return a ? (a ^ Math.random() * 16 >> a / 4).toString(16) : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, b)
   }
 
 
@@ -93,8 +91,8 @@ module.exports = function(opts) {
     fs.exists(dir, function(exists) {
       if (!exists) {
         mkdirp(dir, function(err) {
-          if (err) console.error(err);
-          else console.log('The uploads folder was not present, we have created it for you [' + dir + ']');
+          if (err) console.error(err)
+          else console.log("The uploads folder was not present, we have created it for you [" + dir + "]");
         });
         //throw new Error(dir + ' does not exists. Please create the folder');
       }
@@ -138,11 +136,9 @@ module.exports = function(opts) {
     });
   }
 
-  // This function is never used
   var utf8encode = function(str) {
     return unescape(encodeURIComponent(str));
   };
-  
   var nameCountFunc = function(s, index, ext) {
     return ' (' + ((parseInt(index, 10) || 0) + 1) + ')' + (ext || '');
   };
@@ -206,16 +202,17 @@ module.exports = function(opts) {
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
     res.setHeader('Content-Disposition', 'inline; filename="files.json"');
-  };
+  }
   var fileUploader = {};
 
   fileUploader.get = function(req, res, callback) {
     setNoCacheHeaders(res);
     var files = [];
     if (options.storage.type == 'local') {
-      fs.readdir(options.uploadDir, function(err, list) {
+      var uploadDir = req.param('uploadDir') || options.uploadDir;
+      fs.readdir(uploadDir, function(err, list) {
         list.forEach(function(name) {
-          var stats = fs.statSync(options.uploadDir + '/' + name),
+          var stats = fs.statSync(uploadDir + '/' + name),
             fileInfo;
           if (stats.isFile() && name[0] !== '.') {
             fileInfo = new FileInfo({
@@ -245,13 +242,13 @@ module.exports = function(opts) {
         //else     console.log(data);           // successful response
 
         data.Contents.forEach(function(o) {
-          var fileInfo = new FileInfo({
+          fileInfo = new FileInfo({
             name: options.UUIDRegex.test(o.Key) ? o.Key.split('__')[1] : o.Key,
             size: o.Size
           });
-          var sss = {
+          sss = {
             url: (options.useSSL ? 'https:' : 'http:') + '//s3.amazonaws.com/' + options.storage.aws.bucketName + '/' + o.Key
-          };
+          }
           fileInfo.initUrls(req, sss);
           files.push(fileInfo);
 
@@ -306,30 +303,31 @@ module.exports = function(opts) {
       }
       // part ways here
       if (options.storage.type == 'local') {
-        fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
+        var uploadDir = req.param('uploadDir') || options.uploadDir;
+        fs.renameSync(file.path, uploadDir + '/' + fileInfo.name);
         if (options.copyImgAsThumb && options.imageTypes.test(fileInfo.name)) {
           Object.keys(options.imageVersions).forEach(function(version) {
             counter += 1;
             var opts = options.imageVersions[version];
             if (options.copyImgAsThumb) {
-              lwip.open(options.uploadDir + '/' + fileInfo.name, function(err, image) {
+              lwip.open(uploadDir + '/' + fileInfo.name, function(err, image) {
                 if (opts.height == 'auto') {
                   image.batch()
                     .resize(opts.width)
-                    .writeFile(options.uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
+                    .writeFile(uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
                       if (err) throw err;
                       finish();
                     });
                 } else {
                   image.batch()
                     .resize(opts.width, opts.height)
-                    .writeFile(options.uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
+                    .writeFile(uploadDir + '/' + version + '/' + fileInfo.name, function(err) {
                       if (err) throw err;
                       finish();
                     });
                 }
               });
-            }
+            };
           });
         }
       } else if (options.storage.type == 'aws') {
@@ -358,12 +356,13 @@ module.exports = function(opts) {
   fileUploader.delete = function(req, res, callback) {
     var fileName;
     if (options.storage.type == 'local') {
+      var uploadDir = req.param('uploadDir') || options.uploadDir;
       if (req.url.slice(0, options.uploadUrl.length) === options.uploadUrl) {
         fileName = path.basename(decodeURIComponent(req.url));
         if (fileName[0] !== '.') {
-          fs.unlink(options.uploadDir + '/' + fileName, function(ex) {
+          fs.unlink(uploadDir + '/' + fileName, function(ex) {
             Object.keys(options.imageVersions).forEach(function(version) {
-              fs.unlink(options.uploadDir + '/' + version + '/' + fileName, function(err) {
+              fs.unlink(uploadDir + '/' + version + '/' + fileName, function(err) {
                 //if (err) throw err;
               });
             });
