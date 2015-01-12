@@ -1,27 +1,43 @@
 # Blueimp file upload for Express js
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/arvindr21/blueimp-file-upload-expressjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Build Status](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs.svg?branch=master)](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs) [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/arvindr21/blueimp-file-upload-expressjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![NPM](https://nodei.co/npm/blueimp-file-upload-expressjs.png?downloads=true)](https://nodei.co/npm/blueimp-file-upload-expressjs/)
 
-[![Build Status](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs.svg?branch=master)](https://travis-ci.org/arvindr21/blueimp-file-upload-expressjs)
+A simple express module for integrating the *[jQuery File Upload](http://blueimp.github.io/jQuery-File-Upload/)* frontend plugin.
 
-* A simple express module for integrating jQuery File Upload.
-* The code is borrowed from [here](https://github.com/blueimp/jQuery-File-Upload/tree/master/server/node) and made compatible with Expressjs 
-* [Demo](http://expressjs-fileupload.cloudno.de/)
-* [Tutorial](http://thejackalofjavascript.com/uploading-files-made-fun)
+[Fullstack Demo](http://expressjs-fileupload.cloudno.de/) | [Tutorial on my blog](http://thejackalofjavascript.com/uploading-files-made-fun)
 
+## History
+The code was forked from a sample backend code from the [plugin's repo](https://github.com/blueimp/jQuery-File-Upload/tree/master/server/node). Adaptations were made to show how to use this plugin with the popular *[Express](http://expressjs.com/)* *Node.js* framework.
 
-## Features
-* Upload to server
-* Upload to AWS
-* Client available [here](http://blueimp.github.io/jQuery-File-Upload/)
+Although this code was initially meant for educational purposes, enhancements were made. Users can additionally:
+
+* choose the destination filesystem, local or cloud-based *Amazon S3*,
+* create thumbnail without heavy external dependencies using [lwip](https://www.npmjs.com/package/lwip),
+* setup server-side rules by [configuration](#Configuration),
+* modify the code against a [test harness](#Tests). 
 
 ## Installation
+
+Setup an *Express* project and install the package.
+
 ```js
 $ npm install blueimp-file-upload-expressjs
 ```
-    
-## Options
+
+Beginners can follow the [tutorial](http://thejackalofjavascript.com/uploading-files-made-fun) for detailed instructions.
+
+## Tests
+
+Unit tests can be run with *Jasmine* using `npm test` or this command:
+```js
+$ jasmine-node specs/
+```
+
+Manual end to end tests can be done with [this full project](https://github.com/arvindr21/expressjs-fileupload). Change the `require()` path of [`uploadManager.js`](https://github.com/arvindr21/expressjs-fileupload/blob/master/routes/uploadManager.js#L29) to link it this cloned repository.
+
+## Configuration
 ```js
 options = {
     tmpDir: __dirname + '/tmp', // tmp dir to upload files to
@@ -55,7 +71,7 @@ options = {
 };
 
 ```
-## Usage with options 
+### Usage with options 
 (*refer tutorial*)
 ```js
 // config the uploader
@@ -124,7 +140,7 @@ module.exports = function (router) {
     return router;
 }
 ```
-## SSL Support
+### SSL Support
 
 Set the `useSSL` option to `true` to use the package with an [HTTPS server](http://expressjs.com/4x/api.html#app.listen).
 ```js
@@ -159,7 +175,7 @@ https.createServer({key: app_key, cert: app_cert}, app).listen(443);
 
 ```
 
-## Multiple thumbnails
+### Multiple thumbnails
 
 To generate multiple thumbnails while uploading
 
@@ -228,19 +244,28 @@ var options = {
 };
 ```
 
-## Todo
+## Contributions
 
-* Refactor code to build tests
-* ~~Fix Thumbnail creation when uploading images with a more 'feasible' appraoch~~
-* Add reizing, croping and other filter effects
-* ~~Amazon S3 Intergartion~~
-* Azure Integration
-* ~~SSL SUpport~~
+Changes and improvements are welcome! Feel free to fork and open a pull request.
+
+### To Do
+* Make [Configuration](#Configuration) documentation clearer and shorter,
+* Refactor code to build tests and provide generic transports as in `winston`, 
+* Write end to end tests with [WebdriverIO](http://webdriver.io/),
+* Provide a basic image processing pipeline (resizing, croping, filter effects),
+* Provide access to other cloud-based services like *Microsoft Azure*.
+
+### Done
+
+* ~~Fix Thumbnail creation when uploading images with a more 'feasible' approach~~,
+* ~~Amazon S3 integration~~,
+* ~~SSL Support~~.
 
 ***
 ## License
 
-### MIT
+*blueimp-file-upload-expressjs* is licensed under the [MIT licence](http://opensource.org/licenses/MIT).
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
