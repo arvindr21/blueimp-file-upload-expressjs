@@ -165,7 +165,9 @@ function uploadService(opts) {
     var map = {};
     var counter = 1;
     var redirect;
-    
+   
+    req.body = req.body || {};
+
     function finish(sss, error) {
       counter -= 1;
       if (!counter) {
@@ -189,6 +191,18 @@ function uploadService(opts) {
     }).on('field', function(name, value) {
       if (name === 'redirect') {
         redirect = value;
+      }
+      // In order to make lusca's csrf function work, we need to attach the form's text field data to req.body
+      // (referencing to https://github.com/krakenjs/lusca/blob/master/lib/csrf.js line 42)
+      // 
+      if (req.body.hasOwnProperty(name)) {
+        if (Array.isArray(req.body[name])) {
+          req.body[name].push(val);
+        } else {
+          req.body[name] = [req.body[name], val];
+        }
+      } else {
+        req.body[fieldname] = val;
       }
     }).on('file', function(name, file) {
       var fileInfo = map[path.basename(file.path)];
