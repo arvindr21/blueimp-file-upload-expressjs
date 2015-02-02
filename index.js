@@ -197,12 +197,12 @@ function uploadService(opts) {
       // 
       if (req.body.hasOwnProperty(name)) {
         if (Array.isArray(req.body[name])) {
-          req.body[name].push(val);
+          req.body[name].push(value);
         } else {
-          req.body[name] = [req.body[name], val];
+          req.body[name] = [req.body[name], value];
         }
       } else {
-        req.body[fieldname] = val;
+        req.body[fieldname] = value;
       }
     }).on('file', function(name, file) {
       var fileInfo = map[path.basename(file.path)];
