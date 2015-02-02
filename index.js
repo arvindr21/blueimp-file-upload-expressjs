@@ -165,7 +165,9 @@ function uploadService(opts) {
     var map = {};
     var counter = 1;
     var redirect;
-    
+   
+    req.body = req.body || {};
+
     function finish(sss, error) {
       counter -= 1;
       if (!counter) {
