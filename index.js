@@ -209,6 +209,7 @@ function uploadService(opts) {
             var opts = options.imageVersions[version];
             if (options.copyImgAsThumb) {
               lwip.open(options.uploadDir + '/' + fileInfo.name, function(err, image) {
+                if(err) throw err;
                 if (opts.height == 'auto') {
                   image.batch()
                     .resize(opts.width)
