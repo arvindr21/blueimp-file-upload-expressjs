@@ -10,7 +10,7 @@ module.exports = uploadService;
 
 function uploadService(opts) {
     var options = configs.apply(opts);
-    var transporter = options.storage.type === 'local'? require('./lib/transport/aws'):require('./lib/transport/local');
+    var transporter = require('./lib/transport/'+options.storage.type === 'local'?'aws':'local')(options);
     transporter = transporter(options);
 
     var fileUploader = {};
@@ -42,7 +42,7 @@ function uploadService(opts) {
             finish.counter -= 1;
             if (!finish.counter) {
                 files.forEach(function(fileInfo) {
-                    fileInfo.initUrls(req, sss);
+                    fileInfo.initUrls(req, sss,versions);
                 });
                 callback(error,{files: files,versions:versions}, redirect);
             }
@@ -82,13 +82,13 @@ function uploadService(opts) {
             console.log('form.error',e);
             finish(e);
         }).on('progress', function(bytesReceived) {
-          if (bytesReceived > options.maxPostSize) {
-            req.connection.destroy();
-          }
+            if (bytesReceived > options.maxPostSize) {
+                req.connection.destroy();
+            }
         }).on('end', function() {
-          if (options.storage.type == 'local') {
-            finish();
-          }
+            if (options.storage.type == 'local') {
+                finish();
+            }
         }).parse(req);
     };
 

@@ -114,14 +114,16 @@ var uploader = require('blueimp-file-upload-expressjs')(options);
 
 module.exports = function (router) {
     router.get('/upload', function(req, res) {
-      uploader.get(req, res, function (obj) {
-            res.send(JSON.stringify(obj)); 
+      uploader.get(req, res, function (err,obj) {
+            if(!err){
+                res.send(JSON.stringify(obj));
+            }
       });
       
     });
 
     router.post('/upload', function(req, res) {
-      uploader.post(req, res, function (obj, redirect, error) {
+      uploader.post(req, res, function (error,obj, redirect) {
           if(!error)
           {
             res.send(JSON.stringify(obj)); 
@@ -132,8 +134,8 @@ module.exports = function (router) {
     
     // the path SHOULD match options.uploadUrl
     router.delete('/uploaded/files/:name', function(req, res) {
-      uploader.delete(req, res, function (obj) {
-            res.send(JSON.stringify(obj)); 
+      uploader.delete(req, res, function (err,obj) {
+            res.Json({error:err}); 
       });
       
     });
@@ -161,8 +163,9 @@ var options = {
 var uploader = require('blueimp-file-upload-expressjs')(options);
 
 app.get('/upload', function(req, res) {
-    uploader.get(req, res, function (obj) {
-    res.send(JSON.stringify(obj)); 
+    uploader.get(req, res, function (err,obj) {
+    if(!err)
+        res.send(JSON.stringify(obj)); 
 })
     .post('/upload', // ...
     .delete('/uploaded/files/:name', // ...
