@@ -1,7 +1,7 @@
 'use strict';
 
 var FileInfo        = require('./lib/fileinfo.js');
-var configs         = require('./lib/configs');
+var configs         = require('./lib/configs.js');
 var formidable      = require('formidable');
 var fs              = require('fs');
 var path            = require('path');
@@ -10,7 +10,8 @@ module.exports = uploadService;
 
 function uploadService(opts) {
     var options = configs.apply(opts);
-    var transporter = require('./lib/transport/'+options.storage.type === 'local'?'aws':'local')(options);
+    var transporter = options.storage.type === 'local'?require('./lib/transport/local.js'):require('./lib/transport/aws.js');
+    
     transporter = transporter(options);
 
     var fileUploader = {};
