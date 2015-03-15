@@ -36,28 +36,39 @@ function uploadService(opts) {
         var files = [];
         var map = {};
         var redirect;
-   
+
+        this.config.host = req.headers.host;
+
+        var configs = this.config;
+
         req.body = req.body || {};
 
-        function finish(error,sss,versions) {
-            finish.counter -= 1;
-            if (!finish.counter) {
-                files.forEach(function(fileInfo) {
-                    fileInfo.initUrls(req, sss,versions);
-                });
-                callback(error,{files: files,versions:versions}, redirect);
+        function finish(error,fileInfo) {
+          
+            if(error) return callback(error,{files:files},redirect);
+
+            if(!fileInfo) return callback(null,{files:files},redirect);
+
+            console.log('fileInfo',fileInfo);
+
+            var allFilesProccessed = true;
+            
+            files.forEach(function(file,idx){
+                allFilesProccessed = allFilesProccessed && file.proccessed;    
+            });
+            
+            if(allFilesProccessed) {
+                callback(null,{files: files}, redirect);
             }
         }
-
-        finish.counter = 1;
         
-        form.uploadDir = options.tmpDir;
+        form.uploadDir = configs.tmpDir;
 
         form.on('fileBegin', function(name, file) {
             tmpFiles.push(file.path);
-            var fileInfo = new FileInfo(file, options, req, true);
-            fileInfo.safeName();
-            map[path.basename(file.path)] = fileInfo;
+            var fileInfo = new FileInfo(file, configs);
+            var fileKey = path.basename(file.path);
+            map[fileKey] = fileInfo;
             files.push(fileInfo);
         }).on('field', function(name, value) {
             if (name === 'redirect') {
@@ -65,7 +76,7 @@ function uploadService(opts) {
             }
         }).on('file', function(name, file) {
             var fileInfo = map[path.basename(file.path)];
-            fileInfo.size = file.size;
+            fileInfo.update(file);
             if (!fileInfo.validate()) {
                 finish(fileInfo.error);
                 fs.unlink(file.path);
@@ -83,13 +94,13 @@ function uploadService(opts) {
             console.log('form.error',e);
             finish(e);
         }).on('progress', function(bytesReceived) {
-            if (bytesReceived > options.maxPostSize) {
+            if (bytesReceived > configs.maxPostSize) {
                 req.connection.destroy();
             }
         }).on('end', function() {
-            if (options.storage.type == 'local') {
-                finish();
-            }
+            //if (configs.storage.type == 'local') {
+            //    finish();
+            //}
         }).parse(req);
     };
 
