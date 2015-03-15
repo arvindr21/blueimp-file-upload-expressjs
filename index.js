@@ -49,8 +49,6 @@ function uploadService(opts) {
 
             if(!fileInfo) return callback(null,{files:files},redirect);
 
-            console.log('fileInfo',fileInfo);
-
             var allFilesProccessed = true;
             
             files.forEach(function(file,idx){
@@ -67,15 +65,14 @@ function uploadService(opts) {
         form.on('fileBegin', function(name, file) {
             tmpFiles.push(file.path);
             var fileInfo = new FileInfo(file, configs);
-            var fileKey = path.basename(file.path);
-            map[fileKey] = fileInfo;
+            map[fileInfo.key] = fileInfo;
             files.push(fileInfo);
         }).on('field', function(name, value) {
             if (name === 'redirect') {
                 redirect = value;
             }
         }).on('file', function(name, file) {
-            var fileInfo = map[path.basename(file.path)];
+            var fileInfo = map[FileInfo.getFileKey(file.path)];
             fileInfo.update(file);
             if (!fileInfo.validate()) {
                 finish(fileInfo.error);
