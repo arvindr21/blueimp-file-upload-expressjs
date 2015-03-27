@@ -14,7 +14,10 @@
     "mkdirp": "latest"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.2"
+    "gulp": "^3.8.11",
+    "gulp-jshint": "^1.9.4",
+    "jasmine-node": "1.14.2",
+    "jshint-stylish": "^1.0.1"
   },
   "repository": {
     "type": "git",
