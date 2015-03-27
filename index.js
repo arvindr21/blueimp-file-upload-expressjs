@@ -1,3 +1,4 @@
+/*jslint node: true */
 'use strict';
 
 var FileInfo        = require('./lib/fileinfo.js');
