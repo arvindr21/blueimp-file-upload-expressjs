@@ -200,7 +200,9 @@ function uploadService(opts) {
       }
       // part ways here
       if (options.storage.type == 'local') {
-        fs.renameSync(file.path, options.uploadDir + '/' + fileInfo.name);
+        var buffer = fs.readFileSync(file.path);
+        fs.appendFileSync(options.uploadDir + '/' + fileInfo.name,buffer);
+        
         if (options.copyImgAsThumb && options.imageTypes.test(fileInfo.name)) {
           Object.keys(options.imageVersions).forEach(function(version) {
             counter += 1;
