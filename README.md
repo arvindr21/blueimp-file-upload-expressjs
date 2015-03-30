@@ -8,11 +8,48 @@ A simple express module for integrating the *[jQuery File Upload](http://blueimp
 
 [Fullstack Demo](http://expressjs-fileupload.cloudno.de/) | [Tutorial on my blog](http://thejackalofjavascript.com/uploading-files-made-fun)
 
+## V0.0.4 Released!
+
+### Main features in v0.0.4
+
+1. Upgrade lwip to v0.0.6
+  > It means that we can upload and proccess GIF images now.
+
+2. More NodeJs friendly callback API
+
+  > Using function(err,data) instead of function(data,err)
+
+### Notices on upgrading v0.0.3 to v0.0.4
+
+In order to make v0.0.4 to work properly, we need to change the uploader instance's callback function correspondingly as mentioned above.
+
+From v0.0.3 style,
+
+```
+uploader.get(req, res, function (obj) {
+    res.send(JSON.stringify(obj)); 
+});
+```
+
+To v0.0.4 style,
+
+```
+uploader.get(req, res, function (err,obj) {
+    if(!err){
+        res.send(JSON.stringify(obj));
+    }
+});
+
+```
+
+Similar rule that applies to the callback functions of `uploader.post` and `uploader.delete`. 
+
 ## History
 The code was forked from a sample backend code from the [plugin's repo](https://github.com/blueimp/jQuery-File-Upload/tree/master/server/node). Adaptations were made to show how to use this plugin with the popular *[Express](http://expressjs.com/)* *Node.js* framework.
 
 Although this code was initially meant for educational purposes, enhancements were made. Users can additionally:
 
+* upgrade lwip to version 0.0.6 to support gif images (New at v0.0.4)
 * choose the destination filesystem, local or cloud-based *Amazon S3*,
 * create thumbnail without heavy external dependencies using [lwip](https://www.npmjs.com/package/lwip),
 * setup server-side rules by [configuration](#Configuration),
