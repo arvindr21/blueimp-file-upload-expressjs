@@ -1,5 +1,4 @@
 'use strict';
-
 describe('FileInfo package', function() {
   var FileInfo = require('../lib/fileinfo.js');
   // TODO - FileInfo default constructor or mock parameters
@@ -24,6 +23,11 @@ describe('Uploader configuration', function() {
   beforeEach(function() {
     // TODO - Create a mock object for the filesystem
     uploader = require('../index');
+  });
+ 
+  it('can require configs without error',function(){
+    var configs = require('../lib/configs.js');
+    expect(configs).not.toBe(null);
   });
 
   it('should have default config values', function() {
