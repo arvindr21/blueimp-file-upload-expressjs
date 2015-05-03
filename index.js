@@ -26,6 +26,7 @@ function uploadService(opts) {
     }
 
     fileUploader.get = function(req, res, callback) {
+        this.config.host = req.headers.host;
         setNoCacheHeaders(res);
         transporter.get(callback);
     }; 
