@@ -1,18 +1,18 @@
 /*jslint node: true */
 'use strict';
 
-var FileInfo        = require('./lib/fileinfo.js');
-var configs         = require('./lib/configs.js');
-var formidable      = require('formidable');
-var fs              = require('fs');
-var path            = require('path');
+var FileInfo = require('./lib/fileinfo.js');
+var configs = require('./lib/configs.js');
+var formidable = require('formidable');
+var fs = require('fs');
+var path = require('path');
 
 module.exports = uploadService;
 
 function uploadService(opts) {
     var options = configs.apply(opts);
-    var transporter = options.storage.type === 'local'?require('./lib/transport/local.js'):require('./lib/transport/aws.js');
-    
+    var transporter = options.storage.type === 'local' ? require('./lib/transport/local.js') : require('./lib/transport/aws.js');
+
     transporter = transporter(options);
 
     var fileUploader = {};
@@ -29,8 +29,8 @@ function uploadService(opts) {
         this.config.host = req.headers.host;
         setNoCacheHeaders(res);
         transporter.get(callback);
-    }; 
-  
+    };
+
     fileUploader.post = function(req, res, callback) {
         setNoCacheHeaders(res);
         var form = new formidable.IncomingForm();
@@ -45,27 +45,35 @@ function uploadService(opts) {
 
         req.body = req.body || {};
 
-        function finish(error,fileInfo) {
-          
-            if(error) return callback(error,{files:files},redirect);
+        function finish(error, fileInfo) {
 
-            if(!fileInfo) return callback(null,{files:files},redirect);
+            if (error) return callback(error, {
+                files: files
+            }, redirect);
+
+            if (!fileInfo) return callback(null, {
+                files: files
+            }, redirect);
 
             var allFilesProccessed = true;
-            
-            files.forEach(function(file,idx){
-                allFilesProccessed = allFilesProccessed && file.proccessed;    
+
+            files.forEach(function(file, idx) {
+                allFilesProccessed = allFilesProccessed && file.proccessed;
             });
-            
-            if(allFilesProccessed) {
-                callback(null,{files: files}, redirect);
+
+            if (allFilesProccessed) {
+                callback(null, {
+                    files: files
+                }, redirect);
             }
         }
-        
+
         form.uploadDir = configs.tmpDir;
 
         form.on('fileBegin', function(name, file) {
             tmpFiles.push(file.path);
+            // fix #41
+            configs.saveFile = true;
             var fileInfo = new FileInfo(file, configs);
             map[fileInfo.key] = fileInfo;
             files.push(fileInfo);
@@ -82,7 +90,7 @@ function uploadService(opts) {
                 return;
             }
 
-            transporter.post(fileInfo,file,finish);
+            transporter.post(fileInfo, file, finish);
 
         }).on('aborted', function() {
             finish('aborted');
@@ -90,7 +98,7 @@ function uploadService(opts) {
                 fs.unlink(file);
             });
         }).on('error', function(e) {
-            console.log('form.error',e);
+            console.log('form.error', e);
             finish(e);
         }).on('progress', function(bytesReceived) {
             if (bytesReceived > configs.maxPostSize) {
@@ -104,7 +112,7 @@ function uploadService(opts) {
     };
 
     fileUploader.delete = function(req, res, callback) {
-        transporter.delete(req,res,callback);    
+        transporter.delete(req, res, callback);
     };
 
     return fileUploader;
