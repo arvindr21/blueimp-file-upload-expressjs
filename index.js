@@ -37,6 +37,7 @@ function uploadService(opts) {
         var tmpFiles = [];
         var files = [];
         var map = {};
+		var fields = {};
         var redirect;
 
         this.config.host = req.headers.host;
@@ -74,10 +75,11 @@ function uploadService(opts) {
             tmpFiles.push(file.path);
             // fix #41
             configs.saveFile = true;
-            var fileInfo = new FileInfo(file, configs);
+            var fileInfo = new FileInfo(file, configs, fields);
             map[fileInfo.key] = fileInfo;
             files.push(fileInfo);
         }).on('field', function(name, value) {
+			fields[name] = value;
             if (name === 'redirect') {
                 redirect = value;
             }
