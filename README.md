@@ -8,7 +8,22 @@ A simple express module for integrating the *[jQuery File Upload](http://blueimp
 
 [Fullstack Demo](http://expressjs-fileupload.cloudno.de/) | [Tutorial on my blog](http://thejackalofjavascript.com/uploading-files-made-fun)
 
-## V0.4.0 Released!
+> v 0.4.0 Released!
+
+## Contents
+
+* [Main features in v0.4.0](#main-features-in-v040)
+* [Notices on upgrading v0.3.x to v0.4.0](#notices-on-upgrading-v03x-to-v040)
+* [History](#history)
+* [Installation](#installation)
+* [Configuration](#configuration)
+* [Usage with options](#usage-with-options)
+* [SSL Support](#ssl-support)
+* [Multiple thumbnails](#multiple-thumbnails)
+* [Get Form Fields along with Upload](#get-form-fields-along-with-upload)
+* [Tests](#tests)
+* [Contributions](#contributions)
+
 
 ### Main features in v0.4.0
 
@@ -65,14 +80,6 @@ $ npm install blueimp-file-upload-expressjs
 
 Beginners can follow the [tutorial](http://thejackalofjavascript.com/uploading-files-made-fun) for detailed instructions.
 
-## Tests
-
-Unit tests can be run with *Jasmine* using `npm test` or this command:
-```js
-$ jasmine-node specs/
-```
-
-Manual end to end tests can be done with [this full project](https://github.com/arvindr21/expressjs-fileupload). Change the `require()` path of [`uploadManager.js`](https://github.com/arvindr21/expressjs-fileupload/blob/master/routes/uploadManager.js#L29) to link it this cloned repository.
 
 ## Configuration
 ```js
@@ -284,15 +291,30 @@ var options = {
 };
 ```
 
+## Get Form Fields along with Upload
+> Form fields will come as a part of a JSON object of fileInfo(like title/description). If not specified then will return empty object. [[PR42](https://github.com/arvindr21/blueimp-file-upload-expressjs/pull/42)]
+
+Refer to : [How to submit additional form data](https://github.com/blueimp/jQuery-File-Upload/wiki/How-to-submit-additional-form-data) to send additional form data from the client. 
+
+## Tests
+
+Unit tests can be run with *Jasmine* using `npm test` or this command:
+```js
+$ jasmine-node specs/
+```
+
+Manual end to end tests can be done with [this full project](https://github.com/arvindr21/expressjs-fileupload). Change the `require()` path of [`uploadManager.js`](https://github.com/arvindr21/expressjs-fileupload/blob/master/routes/uploadManager.js#L29) to link it this cloned repository.
+
 ## Contributions
 
 Changes and improvements are welcome! Feel free to fork and open a pull request.
 
 ### To Do
-* Make [Configuration](#Configuration) documentation clearer and shorter,
+* Make [Configuration](#configuration) documentation clearer and shorter,
 * Refactor code to build tests and provide generic transports as in `winston`, 
 * Write end to end tests with [WebdriverIO](http://webdriver.io/),
 * Provide a basic image processing pipeline (resizing, croping, filter effects),
+* Fix AWS thubnail issue,
 * Provide access to other cloud-based services like *Microsoft Azure*.
 
 ### Done
