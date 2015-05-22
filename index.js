@@ -19,6 +19,11 @@ function uploadService(opts) {
 
     fileUploader.config = options;
 
+    fileUploader.ReapplyOptions = function(__opts){
+        var __options = configs.apply(__opts);
+        fileUploader.config = __options;
+    };
+
     function setNoCacheHeaders(res) {
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
