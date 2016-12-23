@@ -4,6 +4,8 @@
 
 [![NPM](https://nodei.co/npm/blueimp-file-upload-expressjs.png?downloads=true)](https://nodei.co/npm/blueimp-file-upload-expressjs/)
 
+## * * This project is no longer under active maintenance, if anyone is interested to manage this, please reach out to me. * *
+
 A simple express module for integrating the *[jQuery File Upload](http://blueimp.github.io/jQuery-File-Upload/)* frontend plugin.
 
 [Fullstack Demo](http://expressjs-fileupload.cloudno.de/) | [Tutorial on my blog](http://thejackalofjavascript.com/uploading-files-made-fun)
