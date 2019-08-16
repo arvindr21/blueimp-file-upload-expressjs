@@ -30,7 +30,7 @@ A simple express module for integrating the *[jQuery File Upload](http://blueimp
 ### Main features in v0.4.0
 
 1. Upgrade lwip to v0.0.6
-  > It means that we can upload and proccess GIF images now.
+  > It means that we can upload and process GIF images now.
 
 2. More NodeJs friendly callback API
 
